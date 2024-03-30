@@ -1,2 +1,1 @@
-Sendet eine Wetterbericht-Mail von einer Region mithilfe der API von OpenWeather. Benötigt folgendes: Längengrad, Breitengrad, OpenWeather API-Key und E-Mail. 
-Mithilfe des Windows Task Shedulers kann man täglich eine E-Mail versenden lassen mit der empfohlenen Kleidung, die man anziehen sollte.
+Sendet eine Wetterbericht-Mail von einer Region mithilfe der API von OpenWeather. In einem TKinter GUI kann man alle Parameter übersichtlich eingeben, erforderlich ist lediglich eine E-Mail mit dem dazugehörigem Passwort. 
