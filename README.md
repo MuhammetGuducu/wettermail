@@ -1,1 +1,1 @@
-Sendet eine Wetterbericht-Mail von einer Region mithilfe der API von OpenWeather. In einem TKinter GUI kann man alle Parameter übersichtlich eingeben, erforderlich ist lediglich eine E-Mail mit dem dazugehörigem Passwort. 
+Sendet eine E-Mail über smtplib mithilfe der OpenWeather-API. In einem TKinter GUI kann man alle Parameter übersichtlich ändern, erforderlich ist lediglich eine E-Mail mit dem dazugehörigem Passwort. 
