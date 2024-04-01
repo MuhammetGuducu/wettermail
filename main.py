@@ -1,4 +1,3 @@
-# Alle notwendigen Bibliotheken:
 import tkinter as tk
 import requests
 import smtplib
@@ -28,7 +27,7 @@ def clothing(temperature, cold_threshold, warm_threshold):
     else:
         return "normale Kleidung"
 
-
+# Verbindet sich mit OpenWeatherMap um Echtzeitwetterdaten zu sammeln
 def getData(api_key, lat, lon, lang):
     request_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&lang={lang}"
     feedback = requests.get(request_url)
@@ -37,7 +36,7 @@ def getData(api_key, lat, lon, lang):
     else:
         return None
 
-
+# Sendet die Wetterberichts E-Mail
 def sendEmail(data, sender, receiver, password, cold_threshold, warm_threshold):
     if data:
         region = data["name"] ## Ruhrort
@@ -93,11 +92,34 @@ def sendEmail(data, sender, receiver, password, cold_threshold, warm_threshold):
                 server.login(sender, password)
                 server.sendmail(sender, receiver, msg.as_string())
                 server.quit()
-                print("E-Mail erfolgreich gesendet!")
+                print("Mail erfolgreich gesendet!")
         except Exception as e:
-            print(f"Fehler beim Senden der E-Mail: {e}")
+            print(f"Fehler beim Senden der Mail: {e}")
 
 
+# Erstellt eine Standardkonfigurationsdatei, falls keine vorhanden ist oder wenn der Fernet-Key ungültig ist
+def createDefaultConfig():
+    config = configparser.ConfigParser()
+
+    config['WEATHER'] = {
+        'latitude': '51.4344',
+        'longitude': '6.7623',
+        'language': 'de',
+        'cold_threshold': '5',
+        'warm_threshold': '20'
+    }
+
+    config['EMAIL'] = {
+        'sender_email': 'sender@gmail.com',
+        'encrypted_password': '',
+        'receiver_email': 'receiver@gmail.com'
+    }
+
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
+
+
+# Falls der Nutzer auf "Eingaben speichern" und "Senden" klickt, werden alle eingegebenen Daten in die config.ini geschrieben
 def saveConfig(lat, lon, lang, cold_threshold, warm_threshold, sender, receiver, password, key):
     config = configparser.ConfigParser()
     config.read('config.ini')
@@ -121,8 +143,12 @@ def saveConfig(lat, lon, lang, cold_threshold, warm_threshold, sender, receiver,
         config.write(configData)
 
 
+# Inhalte der Eingabefelder werden aus der config.ini geladen
 def loadConfig():
     config = configparser.ConfigParser() #configparser bibliothek um ini dateien lesen/schreiben
+    import os
+    if not os.path.exists('config.ini'):
+        createDefaultConfig()
     config.read('config.ini')
 
     with open('passwordKey.txt', 'rb') as passwordKey: # read-binary
@@ -145,11 +171,11 @@ def loadConfig():
     }
 
 
+# Hier wird das GUI erstellt, die Daten werden gesammelt um die Email zu senden
 def input():
     def submitButton():
-        apiKey = "e055a71967956ab0d652f985f92e79a4"
-        with open ("passwordKey.txt", "r") as file:
-            passwordKey = file.read()
+
+
         lat = latInput.get()
         lon = lonInput.get()
         lang = langInput.get()
@@ -170,8 +196,8 @@ def input():
 
 
     window = tk.Tk() # Haupt-Fenster für die Eingabe wird gestartet
-    window.title("Wetterbericht Parameter")
-    window.geometry("320x280")
+    window.title("WetterMail")
+    window.geometry("360x230")
     inputWidth = 35
 
     tk.Label(window, text="Breitengrad:").grid(row=1, column=0) # Text "Breitengrad" soll auf Zeile 1, Spalte 0 sein
@@ -224,5 +250,18 @@ def input():
     window.mainloop() # Reagiert auf Benutzereingaben, aktualisiert die GUI bis es beendet wird durch destroy
 
 
+# Key-Erstellung und Überprüfung
 if __name__ == "__main__":
+    apiKey = "e055a71967956ab0d652f985f92e79a4"
+    try:
+        with open("passwordKey.txt", "r") as file:
+            passwordKey = file.read()
+            Fernet(passwordKey)  # Erstelle Fernet objekt um zu überprüfen ob der Schlüssel gültig ist
+    except (FileNotFoundError, ValueError): # Datei existiert nicht oder Schlüssel ist ungültig
+        passwordKey = Fernet.generate_key().decode()
+        createDefaultConfig()
+        print("Ungültiger Fernet Key, alle Konfigurationsdaten wurden zurückgesetzt!")
+        with open("passwordKey.txt", "w") as file:
+            file.write(passwordKey) # Schreibt einen neuen Key in passwordKey.txt
+
     input()
