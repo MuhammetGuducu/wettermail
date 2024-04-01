@@ -28,24 +28,24 @@ Das Hauptziel von WetterMail ist es, eine automatisierte Lösung für den tägli
 
 - Integration zusätzlicher Wetterdatenquellen für genauere Vorhersagen und Empfehlungen.
 - Verbesserung der Benutzerinteraktionen in der GUI.
-- Implementierung von Benutzerprofilen für personalisierte Einstellungen wie zb. Outfit-Bezeichnungen
-- Entwicklung einer Chrome-Erweiterung bzw. eines Tampermonkey-Skripts.
+- Implementierung von Benutzerprofilen für personalisierte Einstellungen wie zb. Outfit-Bezeichnungen.
+- Verbesserung der Sicherheit, siehe "Aktuelle Probleme".
 
 
 
 
 ## Aktuelle Probleme
 
-- **Sicherheitsbedenken**: Der aktuelle Einsatz von Fernet für die Verschlüsselung ist nicht absolut sicher. Sollte der `passwordKey` in falsche Hände geraten, könnten die verschlüsselten Passwörter entschlüsselt werden.
-- **Unterstützung weiterer E-Mail-Provider**: Aktuell ist das Programm nur auf GMail ausgerichtet durch die smtplib Library.
+- **Sicherheit**: Fernet zur Verschlüsselung ist nicht absolut sicher, da der `passwordKey` in falsche Hände geraten kann.
+- **Nur G-Mail-Provider**: Aktuell ist das Programm nur auf GMail ausgerichtet durch die smtplib Library.
 
 
 
 
 > [!TIP]
-> - Zunächst müssen die notwendigen Bibliotheken installiert werden, dies kann man über Pycharm machen
-> - Die Dateien `config.ini` und `passwordKey.txt` sind ebenfalls notwendig
-> - Anschließend kann das Programm über `main.py` gestartet werden
+> - Zunächst müssen die notwendigen Bibliotheken installiert werden, dies kann man über Pycharm machen.
+> - Die Dateien `config.ini` und `passwordKey.txt` sind ebenfalls notwendig.
+> - Anschließend kann das Programm über `main.py` gestartet werden.
 
 
 
