@@ -42,9 +42,10 @@ Das Hauptziel von WetterMail ist es, eine automatisierte Lösung für den tägli
 
 
 
-## Ausführung des Projekts
-
-Zunächst müssen die notwendigen Bibliotheken installiert werden. Die Dateien `config.ini` und `passwordKey.txt` sind ebenfalls notwendig. Anschließend kann das Programm über `main.py` gestartet werden.
+> [!TIP]
+> - Zunächst müssen die notwendigen Bibliotheken installiert werden, dies kann man über eine Entwicklungsumgebung wie Pycharm machen
+> - Die Dateien `config.ini` und `passwordKey.txt` sind ebenfalls notwendig
+> - Anschließend kann das Programm über `main.py` gestartet werden
 
 
 
