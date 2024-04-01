@@ -19,7 +19,9 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 
 ## Zweck des Projekts
 
-Das Hauptziel von WetterMail ist es, eine automatisierte Lösung für den täglichen Bedarf an Wetterinformationen zu bieten. Langfristig könnte es zu einer vollwertigen Anwendung ausgebaut werden, die verschiedene Wetterdienste und erweiterte Personalisierungsfunktionen unterstützt. Aktuell befindet sich das Projekt in einer aktiven Entwicklungsphase. Die Grundfunktionalitäten, wie das Abrufen von Wetterdaten und das Versenden von E-Mails, sind implementiert. Zudem kann der Nutzer eingegebene Werte in der config speichern lassen, diese werden dann beim Klick auf "Senden" in die config geschrieben. Die Werte in der config werden beim nächsten Start automatisch eingelesen.  
+* Das Hauptziel von WetterMail ist es, eine automatisierte Lösung für den täglichen Bedarf an Wetterinformationen zu bieten. 
+* Die Grundfunktionalitäten, wie das Abrufen von Wetterdaten und das Versenden von E-Mails, sind implementiert.
+* Der Nutzer kann Eingaben in der config speichern, beim Klick auf "Senden" werden diese in die config geschrieben um beim nächsten Start automatisch eingelesen zu werden. 
 
 
 
