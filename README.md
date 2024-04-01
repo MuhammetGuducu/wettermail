@@ -46,8 +46,8 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 
 > [!TIP]
 > - Zunächst müssen die notwendigen Bibliotheken installiert werden, dies kann man über Pycharm machen.
-> - Die Dateien `config.ini` und `passwordKey.txt` sind ebenfalls notwendig.
 > - Anschließend kann das Programm über `main.py` gestartet werden.
+> - Der Nutzer kann alle Informationen im GUI eingeben und gegebenfalls speichern. 
 
 
 
