@@ -43,6 +43,9 @@ Zunächst müssen die notwendigen Bibliotheken installiert werden. Die Dateien `
 
 
 
-## Screenshots
+## Screenshots 
 ![EMAIL](https://github.com/MuhammetGuducu/wettermail/assets/84397069/a2f6554f-f4d9-43ae-ac6f-da113c3b6460)
-![GUI](https://github.com/MuhammetGuducu/wettermail/assets/84397069/cb412b6b-c60b-436c-be86-5dcb06cb0adf)
+![GUI](https://github.com/MuhammetGuducu/wettermail/assets/84397069/cb412b6b-c60b-436c-be86-5dcb06cb0adf) ![config](https://github.com/MuhammetGuducu/wettermail/assets/84397069/a2fa732c-15e2-4aa0-b4a9-f073ecbfc8fa)
+Passwort '123123123' wird zu 'gAAAAABmCekawI3tCNvRUZySPOGFtZox_utEcUT8SFEusxDkdJoNKrqJiym2JUY6pPtOUn-RLQjsIjrV1yjZOAnUUI2WS9_eFw==' verschlüsselt
+
+
