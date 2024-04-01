@@ -1,3 +1,48 @@
-Sendet eine E-Mail über smtplib mithilfe der OpenWeather-API. In einem TKinter GUI kann man alle Parameter übersichtlich ändern, erforderlich ist lediglich eine E-Mail mit dem dazugehörigem Passwort. 
+# WetterMail
 
-![Screenshot vom Wetterbericht](https://github.com/MuhammetGuducu/wettermail/assets/84397069/a2f6554f-f4d9-43ae-ac6f-da113c3b6460)
+WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parametern personalisierte Wetterberichte per E-Mail zusendet. Es nutzt die OpenWeatherMap-API, um Echtzeit-Wetterdaten zu sammeln, analysiert diese Daten und sendet dann maßgeschneiderte Empfehlungen wie zb. welche Kleidung empfohlen wird.
+
+
+
+## Verwendete Technologien
+
+- **Python**: Einzige Programmiersprache, die verwendet wurde.
+- **Tkinter**: Eine Python-Bibliothek für die Erstellung des GUI.
+- **Requests**: Für HTTP-Anfragen zur Abfrage der Wetterdaten.
+- **smtplib**: Zum Versenden von E-Mails.
+- **configparser**: Für das Lesen/Schreiben von Konfigurationsdateien.
+- **Cryptography-Fernet**: Für die sichere Speicherung von Passwörtern.
+
+
+
+## Ziele des Projekts
+
+Das Hauptziel von WetterMail ist es, eine automatisierte Lösung für den täglichen Bedarf an Wetterinformationen zu bieten. Langfristig könnte es zu einer vollwertigen Anwendung ausgebaut werden, die verschiedene Wetterdienste und erweiterte Personalisierungsfunktionen unterstützt. Aktuell befindet sich das Projekt in einer aktiven Entwicklungsphase. Die Grundfunktionalitäten, wie das Abrufen von Wetterdaten und das Versenden von E-Mails, sind implementiert.
+
+
+
+## Zukünftige Erweiterungen
+
+- Integration zusätzlicher Wetterdatenquellen für genauere Vorhersagen und Empfehlungen.
+- Verbesserung der Benutzerinteraktionen in der GUI.
+- Implementierung von Benutzerprofilen für personalisierte Einstellungen wie zb. Outfit-Bezeichnungen
+- Entwicklung einer Chrome-Erweiterung bzw. eines Tampermonkey-Skripts.
+
+
+
+## Aktuelle Probleme
+
+- **Sicherheitsbedenken**: Der aktuelle Einsatz von Fernet für die Verschlüsselung ist nicht absolut sicher. Sollte der `passwordKey` in falsche Hände geraten, könnten die verschlüsselten Passwörter entschlüsselt werden.
+- **Unterstützung weiterer E-Mail-Provider**: Aktuell ist das Programm nur auf GMail ausgerichtet durch die smtplib Library.
+
+
+
+## Ausführung des Projekts
+
+Zunächst müssen die notwendigen Bibliotheken installiert werden. Die Dateien `config.ini` und `passwordKey.txt` sind ebenfalls notwendig. Anschließend kann das Programm über `main.py` gestartet werden.
+
+
+
+## Screenshots
+![EMAIL](https://github.com/MuhammetGuducu/wettermail/assets/84397069/a2f6554f-f4d9-43ae-ac6f-da113c3b6460)
+![GUI](https://github.com/MuhammetGuducu/wettermail/assets/84397069/cb412b6b-c60b-436c-be86-5dcb06cb0adf)
