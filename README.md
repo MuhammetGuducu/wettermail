@@ -37,7 +37,7 @@ Das Hauptziel von WetterMail ist es, eine automatisierte Lösung für den tägli
 ## Aktuelle Probleme
 
 - **Sicherheit**: Fernet zur Verschlüsselung ist nicht absolut sicher, da der `passwordKey` in falsche Hände geraten kann.
-- **Nur G-Mail-Provider**: Aktuell ist das Programm nur auf GMail ausgerichtet durch die smtplib Library.
+- **Mehr Mail-Provider**: Aktuell ist das Programm nur auf G-Mail ausgerichtet durch die smtplib Library.
 
 
 
