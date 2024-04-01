@@ -17,9 +17,9 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 
 
 
-## Ziele des Projekts
+## Zweck des Projekts
 
-Das Hauptziel von WetterMail ist es, eine automatisierte Lösung für den täglichen Bedarf an Wetterinformationen zu bieten. Langfristig könnte es zu einer vollwertigen Anwendung ausgebaut werden, die verschiedene Wetterdienste und erweiterte Personalisierungsfunktionen unterstützt. Aktuell befindet sich das Projekt in einer aktiven Entwicklungsphase. Die Grundfunktionalitäten, wie das Abrufen von Wetterdaten und das Versenden von E-Mails, sind implementiert.
+Das Hauptziel von WetterMail ist es, eine automatisierte Lösung für den täglichen Bedarf an Wetterinformationen zu bieten. Langfristig könnte es zu einer vollwertigen Anwendung ausgebaut werden, die verschiedene Wetterdienste und erweiterte Personalisierungsfunktionen unterstützt. Aktuell befindet sich das Projekt in einer aktiven Entwicklungsphase. Die Grundfunktionalitäten, wie das Abrufen von Wetterdaten und das Versenden von E-Mails, sind implementiert. Zudem kann der Nutzer eingegebene Werte in der config speichern lassen, diese werden dann beim Klick auf "Senden" in die config geschrieben. Die Werte in der config werden beim nächsten Start automatisch eingelesen.  
 
 
 
@@ -50,9 +50,5 @@ Zunächst müssen die notwendigen Bibliotheken installiert werden. Die Dateien `
 
 ## Screenshots 
 ![EMAIL](https://github.com/MuhammetGuducu/wettermail/assets/84397069/a2f6554f-f4d9-43ae-ac6f-da113c3b6460)
-![GUI](https://github.com/MuhammetGuducu/wettermail/assets/84397069/cb412b6b-c60b-436c-be86-5dcb06cb0adf) ![Screenshot 2024-04-01 024508](https://github.com/MuhammetGuducu/wettermail/assets/84397069/2eb53a12-1594-4a54-8319-30cfe8a18c46)
-
-Passwort '123123123' wird zu 'gAAAAABmCekawI3tCNvRUZySPOGFtZox_utEcUT8SFEusxDkdJoNKrqJiym2JUY6pPtOUn-RLQjsIjrV1yjZOAnUUI2WS9_eFw==' verschlüsselt
-
-
-
+![CONFIG](https://github.com/MuhammetGuducu/wettermail/assets/84397069/2eb53a12-1594-4a54-8319-30cfe8a18c46)
+![GUI](https://github.com/MuhammetGuducu/wettermail/assets/84397069/cb412b6b-c60b-436c-be86-5dcb06cb0adf)
