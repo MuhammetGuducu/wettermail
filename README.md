@@ -5,7 +5,7 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 
 
 
-## Verwendete Technologien
+## Verwendete Sprachen und Bibliotheken
 
 - **Python**: Einzige Programmiersprache, die verwendet wurde.
 - **Tkinter**: Eine Python-Bibliothek für die Erstellung des GUI.
