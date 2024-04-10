@@ -51,3 +51,4 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 ![EMAIL](https://github.com/MuhammetGuducu/wettermail/assets/84397069/a2f6554f-f4d9-43ae-ac6f-da113c3b6460)
 ![CONFIG](https://github.com/MuhammetGuducu/wettermail/assets/84397069/2eb53a12-1594-4a54-8319-30cfe8a18c46)
 ![GUI](https://github.com/MuhammetGuducu/wettermail/assets/84397069/cb412b6b-c60b-436c-be86-5dcb06cb0adf)
+![TEST](https://github.com/MuhammetGuducu/wettermail/assets/84397069/2e13568e-1aa1-4ab1-930b-fccd4fd37747)
