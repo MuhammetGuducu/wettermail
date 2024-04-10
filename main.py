@@ -50,7 +50,7 @@ def send_email(data, sender, receiver, password, cold_threshold, warm_threshold)
         description = data["weather"][0]["description"]
         temp = round(data["main"]["temp"] - 273.15)
         main = data["weather"][0]["main"]
-        today = datetime.datetime.now().strftime("%d.%m.%y")
+        today = datetime.now().strftime("%d.%m.%y")
 
         conditions_txt = conditions(main)
         clothing_txt = clothing(temp, cold_threshold, warm_threshold)
@@ -99,6 +99,21 @@ def send_email(data, sender, receiver, password, cold_threshold, warm_threshold)
                 server.sendmail(sender, receiver, msg.as_string())
         except smtplib.SMTPException as e:
             print(f"Fehler beim Senden der Mail: {e}")
+
+
+def password_key():
+    try:
+        with open("passwordKey.txt", "r", encoding="utf-8") as file:
+            password_key = file.read()
+            Fernet(password_key)  # This just checks if the key is valid
+            return password_key.encode()  # Return the key as bytes
+    except (FileNotFoundError, ValueError):
+        password_key = Fernet.generate_key().decode()
+        create_default_config()
+        print("Ungültiger Fernet Key, alle Konfigurationsdaten wurden zurückgesetzt!")
+        with open("passwordKey.txt", "w", encoding="utf-8") as file:
+            file.write(password_key)
+        return password_key.encode()  # Return the new key as bytes
 
 
 def create_default_config():
@@ -195,18 +210,18 @@ def user_input():
         receiver = receiver_input.get()
         password = password_input.get()
 
-        if save_config_var.get():
-            save_config(
-                lat,
-                lon,
-                lang,
-                cold_threshold,
-                warm_threshold,
-                sender,
-                receiver,
-                password,
-                password_key,
-            )
+        key = password_key()
+        save_config(
+            lat,
+            lon,
+            lang,
+            cold_threshold,
+            warm_threshold,
+            sender,
+            receiver,
+            password,
+            key,
+        )
 
         data = get_data(API_KEY, lat, lon, lang)
         send_email(data, sender, receiver, password, cold_threshold, warm_threshold)
@@ -274,17 +289,5 @@ def user_input():
 
 if __name__ == "__main__":
     API_KEY = "e055a71967956ab0d652f985f92e79a4"
-    try:
-        with open("passwordKey.txt", "r", encoding="utf-8") as file:
-            password_key = file.read()
-            Fernet(
-                password_key
-            )  # Create Fernet-Object to check if PasswordKey is valid
-    except (FileNotFoundError, ValueError):
-        password_key = Fernet.generate_key().decode()
-        create_default_config()
-        print("Ungültiger Fernet Key, alle Konfigurationsdaten wurden zurückgesetzt!")
-        with open("passwordKey.txt", "w", encoding="utf-8") as file:
-            file.write(password_key)  # if not valid, write a valid passwordKey
-
+    password_key()
     user_input()
