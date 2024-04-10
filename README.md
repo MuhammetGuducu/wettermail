@@ -12,6 +12,7 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 - **smtplib**: Zum Versenden von E-Mails.
 - **configparser**: Für das Lesen/Schreiben von Konfigurationsdateien.
 - **Cryptography-Fernet**: Für die sichere Speicherung von Passwörtern.
+- **Unittests**: Um die Funktionalität von main.py zu testen
 
 
 
@@ -43,7 +44,7 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 > [!TIP]
 > - Zunächst müssen die notwendigen Bibliotheken installiert werden, dies kann man über Pycharm machen.
 > - Anschließend kann das Programm über `main.py` gestartet werden.
-> - Der Nutzer kann alle Informationen im GUI eingeben und gegebenfalls speichern. 
+> - `test_main.py` ist optional, damit lässt sich die Funktionalität testen. 
 
 
 
