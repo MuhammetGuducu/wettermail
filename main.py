@@ -1,13 +1,13 @@
 """
-This module allows you to send weather reports via email.
-It analyzes weather data to suggest clothes based on the weather conditions.
+This module allows you to send weather reports via email
+It retrieves weather data to suggest clothes based on the weather conditions
 
 Functions:
-    - conditions: Recommend clothing based on weather conditions.
-    - clothing: Recommend clothing based on the temperature.
-    - get_data: Collect weather data from OpenWeatherMap API.
+    - conditions: Determines additional clothing based on weather conditions.
+    - clothing: Recommends clothing based on the temperature.
+    - get_data: Fetches weather data from OpenWeatherMap API.
     - send_email: Sends an email with the weather report.
-    - password_key: Generate or retrieve a Fernet key for passwort encryption.
+    - password_key: Generates or retrieves a Fernet key for encryption.
     - create_default_config: Creates a default config.ini file.
     - save_config: Saves the current configuration to config.ini file.
     - load_config: Loads configuration from the config.ini file.
@@ -135,13 +135,13 @@ def send_email(
         </html>
         """
 
-        msg = MIMEMultipart("alternative")
+        msg = MIMEMultipart("alternative")  # Both Text + HTML Content combined
         msg["From"] = sender
         msg["To"] = receiver
         msg["Subject"] = f"Wetterbericht für {region} am {today}"
         msg.attach(MIMEText(html_body, "html"))
 
-        try:
+        try:  # Server connection test, prints clear description of errors
             with smtplib.SMTP("smtp.gmail.com", 587) as server:
                 server.starttls()
                 server.login(sender, password)
@@ -229,6 +229,8 @@ def save_config(
     config.set("EMAIL", "sender_email", sender)
     config.set("EMAIL", "receiver_email", receiver)
 
+    # Encrypted Binary Key from passwordKey.txt saved in "cipher"
+    # Password-String into Bytes, encrypts them and decodes back into string
     cipher = Fernet(key)
     encrypted_password = cipher.encrypt(password.encode()).decode()
     config.set("EMAIL", "encrypted_password", encrypted_password)
@@ -243,17 +245,17 @@ def load_config() -> Dict[str, Any]:
 
     :return: A dictionary containing all configuration values, including decrypted passwords.
     """
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser()  # used to write/read config.ini
     if not os.path.exists("config.ini"):
         create_default_config()
     config.read("config.ini")
 
-    with open("passwordKey.txt", "rb") as password_key:
+    with open("passwordKey.txt", "rb") as password_key:  # rb = read-binary
         key = password_key.read()
 
     cipher = Fernet(key)
     encrypted_password = config.get("EMAIL", "encrypted_password")
-    decrypted_password = (
+    decrypted_password = (  # string into bytes, decrypt bytes and back into string
         cipher.decrypt(encrypted_password.encode()).decode()
         if encrypted_password
         else ""
@@ -313,6 +315,7 @@ def user_input() -> None:
     window.geometry("360x230")
     input_width = 35
 
+    # GUI setup code for the user input
     tk.Label(window, text="Breitengrad:").grid(row=1, column=0)
     lat_input = tk.Entry(window, width=input_width)
     lat_input.insert(0, config_values["latitude"])
@@ -356,7 +359,7 @@ def user_input() -> None:
     submit_button = tk.Button(window, text="Senden", command=on_submit)
     submit_button.grid(row=10, column=0, columnspan=2)
 
-    window.mainloop()
+    window.mainloop()  # GUI Reacts to user interaction like mouse clicks
 
 
 if __name__ == "__main__":
