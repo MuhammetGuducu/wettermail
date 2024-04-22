@@ -13,6 +13,7 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 - **configparser**: Für das Lesen/Schreiben von Konfigurationsdateien.
 - **Cryptography-Fernet**: Für die sichere Speicherung von Passwörtern.
 - **Unittests**: Um die Funktionalität von main.py zu testen
+- **Sphinx**: Eine automatisch generierte HTML Dokumentation für Funktionen
 
 
 
@@ -29,7 +30,7 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 - Integration zusätzlicher Wetterdatenquellen für genauere Vorhersagen und Empfehlungen.
 - Implementierung von Benutzerprofilen für personalisierte Einstellungen wie zb. Outfit-Bezeichnungen.
 - Verbesserung der Sicherheit, siehe "Aktuelle Probleme".
-- ~~Pylint~~, ~~Unittest~~, Type Hinting und Sphinx einbinden.
+- Pylint, Unittest, Type Hinting und Sphinx verwenden. ✅
 - Entwicklung einer Website mit dem Django Framework.
 
 
@@ -53,3 +54,5 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 ![CONFIG](https://github.com/MuhammetGuducu/wettermail/assets/84397069/2eb53a12-1594-4a54-8319-30cfe8a18c46)
 ![GUI](https://github.com/MuhammetGuducu/wettermail/assets/84397069/cb412b6b-c60b-436c-be86-5dcb06cb0adf)
 ![TEST](https://github.com/MuhammetGuducu/wettermail/assets/84397069/2e13568e-1aa1-4ab1-930b-fccd4fd37747)
+![SPHINX](https://github.com/MuhammetGuducu/wettermail/assets/84397069/91c1b4b8-d725-4164-8f8b-76dc4d26e8ea)
+![SPHINX2](https://github.com/MuhammetGuducu/wettermail/assets/84397069/a0a44afe-e05c-4ed5-8727-ef1b9403beb4)
