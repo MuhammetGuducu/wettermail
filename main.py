@@ -1,6 +1,21 @@
 """
-This module provides functionality for sending weather reports via email
-based on the current weather conditions at a specified location.
+This module allows you to send weather reports via email.
+It analyzes weather data to suggest clothes based on the weather conditions.
+
+Functions:
+    - conditions: Recommend clothing based on weather conditions.
+    - clothing: Recommend clothing based on the temperature.
+    - get_data: Collect weather data from OpenWeatherMap API.
+    - send_email: Sends an email with the weather report.
+    - password_key: Generate or retrieve a Fernet key for passwort encryption.
+    - create_default_config: Creates a default config.ini file.
+    - save_config: Saves the current configuration to config.ini file.
+    - load_config: Loads configuration from the config.ini file.
+    - user_input: Takes user input to send the email report.
+
+Example:
+    >>> get_data(api_key, '1', '1', 'de')
+    >>> send_email(weather_data, 'sender@gmail.com', 'receiver@gmail.com', 'password123', '5', '25')
 """
 
 import os
@@ -12,10 +27,16 @@ from datetime import datetime
 import tkinter as tk
 import requests
 from cryptography.fernet import Fernet
+from typing import Optional, Dict, Any
 
 
-def conditions(main):
-    """Determine clothing suggestions based on weather conditions."""
+def conditions(main: str) -> str:
+    """
+    Determine clothing suggestions based on weather conditions.
+
+    :param main: The main weather condition (Rain, Snow etc.).
+    :return: A string with recommended clothing based on weather conditions.
+    """
     if main in ["Rain", "Drizzle", "Thunderstorm"]:
         return "Kopfbedeckung und "
     if main in ["Snow"]:
@@ -23,8 +44,15 @@ def conditions(main):
     return ""
 
 
-def clothing(temperature, cold_threshold, warm_threshold):
-    """Determine clothing suggestions based on temperature."""
+def clothing(temperature: int, cold_threshold: str, warm_threshold: str) -> str:
+    """
+    Determine clothing suggestion based on temperature.
+
+    :param temperature: The current temperature.
+    :param cold_threshold: Temperature below when it starts to get cold.
+    :param warm_threshold: Temperature above when it starts to get warm.
+    :return: A string with recommended clothing based on the temperature.
+    """
     if temperature > int(warm_threshold):
         return "luftige Kleidung"
     if temperature < int(cold_threshold):
@@ -32,19 +60,41 @@ def clothing(temperature, cold_threshold, warm_threshold):
     return "normale Kleidung"
 
 
-def get_data(api_key, lat, lon, lang):
-    """Retrieve weather data from OpenWeatherMap API."""
+def get_data(api_key: str, lat: str, lon: str, lang: str) -> Optional[Dict[str, Any]]:
+    """
+    Retrieve weather data from OpenWeatherMap API.
+
+    :param api_key: API key for accessing OpenWeatherMap data.
+    :param lat: Latitude of the location.
+    :param lon: Longitude of the location.
+    :param lang: Language code for the API results.
+    :return: A dictionary containing the API results.
+    """
     request_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&lang={lang}"
     feedback = requests.get(request_url, timeout=10)
-    if (
-        feedback.status_code == 200
-    ):  # If connection is successful, return the collected data
+    if feedback.status_code == 200:
         return feedback.json()
     return None
 
 
-def send_email(data, sender, receiver, password, cold_threshold, warm_threshold):
-    """Send email with weather report."""
+def send_email(
+    data: Dict[str, Any],
+    sender: str,
+    receiver: str,
+    password: str,
+    cold_threshold: str,
+    warm_threshold: str,
+) -> None:
+    """
+    Sends the email weather report via smtp server.
+
+    :param data: Weather data dictionary containing the email content.
+    :param sender: Email address of the sender.
+    :param receiver: Email address of receiver.
+    :param password: Password for the senders email.
+    :param cold_threshold: Temperature below when it starts to get cold.
+    :param warm_threshold: Temperature above when it starts to get warm.
+    """
     if data:
         region = data["name"]
         description = data["weather"][0]["description"]
@@ -55,7 +105,6 @@ def send_email(data, sender, receiver, password, cold_threshold, warm_threshold)
         conditions_txt = conditions(main)
         clothing_txt = clothing(temp, cold_threshold, warm_threshold)
 
-        #
         html_body = f"""
         <html>
             <head>
@@ -86,13 +135,13 @@ def send_email(data, sender, receiver, password, cold_threshold, warm_threshold)
         </html>
         """
 
-        msg = MIMEMultipart("alternative")  # Both Text + HTML content combined
+        msg = MIMEMultipart("alternative")
         msg["From"] = sender
         msg["To"] = receiver
         msg["Subject"] = f"Wetterbericht für {region} am {today}"
         msg.attach(MIMEText(html_body, "html"))
 
-        try:  # Server connection test, prints clear description of errors
+        try:
             with smtplib.SMTP("smtp.gmail.com", 587) as server:
                 server.starttls()
                 server.login(sender, password)
@@ -101,7 +150,12 @@ def send_email(data, sender, receiver, password, cold_threshold, warm_threshold)
             print(f"Fehler beim Senden der Mail: {e}")
 
 
-def password_key():
+def password_key() -> bytes:
+    """
+    Generate or retrieve a valid Fernet key for encrypting email password.
+
+    :return: Returns bytes containing the Fernet key.
+    """
     try:
         with open("passwordKey.txt", "r", encoding="utf-8") as file:
             password_key = file.read()
@@ -116,8 +170,10 @@ def password_key():
         return password_key.encode()  # Return the new key as bytes
 
 
-def create_default_config():
-    """Create a default configuration file if none is available."""
+def create_default_config() -> None:
+    """
+    Creates a default configuration file if none is available.
+    """
     config = configparser.ConfigParser()
 
     config["WEATHER"] = {
@@ -139,10 +195,28 @@ def create_default_config():
 
 
 def save_config(
-    lat, lon, lang, cold_threshold, warm_threshold, sender, receiver, password, key
-):
+    lat: str,
+    lon: str,
+    lang: str,
+    cold_threshold: str,
+    warm_threshold: str,
+    sender: str,
+    receiver: str,
+    password: str,
+    key: bytes,
+) -> None:
     """
-    Save the current configuration to config.ini if user allows it.
+    Save the current configuration to the config.ini file.
+
+    :param lat: Latitude for weather data.
+    :param lon: Longitude for weather data.
+    :param lang: Language for weather data.
+    :param cold_threshold: Cold temperature for clothing.
+    :param warm_threshold: Warm temperature for clothing.
+    :param sender: Senders email address.
+    :param receiver: Receivers email address.
+    :param password: Senders email password.
+    :param key: Encryption key for securing senders email passwort.
     """
     config = configparser.ConfigParser()
     config.read("config.ini")
@@ -155,8 +229,6 @@ def save_config(
     config.set("EMAIL", "sender_email", sender)
     config.set("EMAIL", "receiver_email", receiver)
 
-    # Encrypted Binary Key from passwordKey.txt saved in "cipher"
-    # Password-String into Bytes, encrypts them and decodes back into string
     cipher = Fernet(key)
     encrypted_password = cipher.encrypt(password.encode()).decode()
     config.set("EMAIL", "encrypted_password", encrypted_password)
@@ -165,24 +237,26 @@ def save_config(
         config.write(config_data)
 
 
-def load_config():
-    """Load configuration from a file."""
-    config = configparser.ConfigParser()  # used to write/read ini files
+def load_config() -> Dict[str, Any]:
+    """
+    Load GUI configuration from the config.ini file.
+
+    :return: A dictionary containing all configuration values, including decrypted passwords.
+    """
+    config = configparser.ConfigParser()
     if not os.path.exists("config.ini"):
         create_default_config()
     config.read("config.ini")
 
-    with open("passwordKey.txt", "rb") as password_key:  # rb = read-binary
+    with open("passwordKey.txt", "rb") as password_key:
         key = password_key.read()
 
     cipher = Fernet(key)
     encrypted_password = config.get("EMAIL", "encrypted_password")
     decrypted_password = (
-        cipher.decrypt(
-            encrypted_password.encode()
-        ).decode()  # string into bytes, decrypt bytes and back into string
+        cipher.decrypt(encrypted_password.encode()).decode()
         if encrypted_password
-        else ""  # return empty string if there is no password
+        else ""
     )
 
     return {
@@ -197,10 +271,15 @@ def load_config():
     }
 
 
-def user_input():
-    """Capture user input for the application and send the email."""
+def user_input() -> None:
+    """
+    Capture user input and send the email based on the input and current weather data.
 
-    def submit_button():
+    This function initializes a Tkinter GUI for user inputs and parameters
+    and uses these inputs to collect weather data and send an email report.
+    """
+
+    def on_submit():
         lat = lat_input.get()
         lon = lon_input.get()
         lang = lang_input.get()
@@ -234,7 +313,6 @@ def user_input():
     window.geometry("360x230")
     input_width = 35
 
-    # GUI setup code for the user input
     tk.Label(window, text="Breitengrad:").grid(row=1, column=0)
     lat_input = tk.Entry(window, width=input_width)
     lat_input.insert(0, config_values["latitude"])
@@ -275,16 +353,10 @@ def user_input():
     receiver_input.insert(0, config_values["receiver_email"])
     receiver_input.grid(row=8, column=1)
 
-    save_config_var = tk.IntVar()
-    save_config_checkbutton = tk.Checkbutton(
-        window, text="Eingaben speichern", variable=save_config_var
-    )
-    save_config_checkbutton.grid(row=9, column=0)
-
-    submit_button = tk.Button(window, text="Senden", command=submit_button)
+    submit_button = tk.Button(window, text="Senden", command=on_submit)
     submit_button.grid(row=10, column=0, columnspan=2)
 
-    window.mainloop()  # GUI Reacts to user interaction like mouse clicks
+    window.mainloop()
 
 
 if __name__ == "__main__":
