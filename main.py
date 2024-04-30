@@ -1,75 +1,128 @@
 """
-This module allows you to send weather reports via email
-It retrieves weather data to suggest clothes based on the weather conditions
+Weather Report Emailer
+======================
 
-Functions:
-    - conditions: Determines additional clothing based on weather conditions.
-    - clothing: Recommends clothing based on the temperature.
-    - get_data: Fetches weather data from OpenWeatherMap API.
-    - send_email: Sends an email with the weather report.
-    - password_key: Generates or retrieves a Fernet key for encryption.
-    - create_default_config: Creates a default config.ini file.
-    - save_config: Saves the current configuration to config.ini file.
-    - load_config: Loads configuration from the config.ini file.
-    - user_input: Takes user input to send the email report.
+This module allows you to send weather reports via email.
+It retrieves weather data to suggest clothes based on the weather conditions at the given location.
 
-Example:
-    >>> get_data(api_key, '1', '1', 'de')
-    >>> send_email(weather_data, 'sender@gmail.com', 'receiver@gmail.com', 'password123', '5', '25')
+Functions
+---------
+
+.. function:: conditions(main: str) -> str
+
+.. function:: clothing(temperature: int, cold_threshold: str, warm_threshold: str) -> str
+
+.. function:: get_data(api_key: str, lat: str, lon: str, lang: str) -> Optional[Dict[str, Any]]
+
+.. function:: send_email(data: Dict[str, Any], sender: str, receiver: str, password: str, cold_threshold: str, warm_threshold: str) -> bool
+
+Classes
+-------
+
+.. class:: ConfigManager
+
+   .. method:: create_default_config() -> None
+
+   .. method:: save_config(settings: Dict[str, Any], password: str, key: bytes) -> None
+
+   .. method:: load_config() -> Dict[str, Any]
+
+   .. method:: generate_password_key() -> bytes
+
+.. class:: UserGUI
+
+   .. method:: initUI()
+
+   .. method:: setupControls(layout)
+
+   .. method:: addTemperatureSliders(layout, config_values)
+
+   .. method:: updateTemperatureLabels()
+
+   .. method:: on_submit()
+
+Example
+-------
+
+.. code-block:: python
+
+   get_data(api_key, '1', '1', 'de')
+   send_email(weather_data, 'sender@gmail.com', 'receiver@gmail.com', 'password123', '5', '25')
+
+
+
+Detailed Descriptions
+-------
+
 """
 
 import os
 import smtplib
 import configparser
+import requests
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
-import tkinter as tk
-import requests
 from cryptography.fernet import Fernet
 from typing import Optional, Dict, Any
+from PyQt5.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+    QMessageBox,
+    QSlider,
+    QHBoxLayout,
+    QCheckBox,
+)
+from PyQt5.QtCore import Qt
 
 
 def conditions(main: str) -> str:
     """
-    Determine clothing suggestions based on weather conditions.
+    Determines additional clothing based on weather conditions.
 
-    :param main: The main weather condition (Rain, Snow etc.).
-    :return: A string with recommended clothing based on weather conditions.
+    :param main: The main weather condition.
+    :return: Recommendations for additional clothing.
     """
     if main in ["Rain", "Drizzle", "Thunderstorm"]:
         return "Kopfbedeckung und "
-    if main in ["Snow"]:
+    elif main in ["Snow"]:
         return "Handschuhe, Kopfbedeckung und "
     return ""
 
 
 def clothing(temperature: int, cold_threshold: str, warm_threshold: str) -> str:
     """
-    Determine clothing suggestion based on temperature.
+    Recommends clothing based on the temperature.
 
     :param temperature: The current temperature.
-    :param cold_threshold: Temperature below when it starts to get cold.
-    :param warm_threshold: Temperature above when it starts to get warm.
-    :return: A string with recommended clothing based on the temperature.
+    :param cold_threshold: The cold threshold.
+    :param warm_threshold: The warm threshold.
+    :return: String to suggest clothing type like warm clothing.
     """
+
     if temperature > int(warm_threshold):
         return "luftige Kleidung"
-    if temperature < int(cold_threshold):
+    elif temperature < int(cold_threshold):
         return "warme Kleidung"
     return "normale Kleidung"
 
 
 def get_data(api_key: str, lat: str, lon: str, lang: str) -> Optional[Dict[str, Any]]:
     """
-    Retrieve weather data from OpenWeatherMap API.
+    Fetches weather data from OpenWeatherMap API.
 
-    :param api_key: API key for accessing OpenWeatherMap data.
-    :param lat: Latitude of the location.
-    :param lon: Longitude of the location.
-    :param lang: Language code for the API results.
-    :return: A dictionary containing the API results.
+    :param api_key: The API key for OpenWeatherMap.
+    :param lat: The latitude of the location.
+    :param lon: The longitude of the location.
+    :param lang: The language for the weather data.
+    :return: A dictionary with the weather data.
     """
+
     request_url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&lang={lang}"
     feedback = requests.get(request_url, timeout=10)
     if feedback.status_code == 200:
@@ -84,285 +137,426 @@ def send_email(
     password: str,
     cold_threshold: str,
     warm_threshold: str,
-) -> None:
+) -> bool:
     """
-    Sends the email weather report via smtp server.
+    Sends an email with the weather report.
 
-    :param data: Weather data dictionary containing the email content.
-    :param sender: Email address of the sender.
-    :param receiver: Email address of receiver.
-    :param password: Password for the senders email.
-    :param cold_threshold: Temperature below when it starts to get cold.
-    :param warm_threshold: Temperature above when it starts to get warm.
+    :param data: The stored weather data.
+    :param sender: The email address of the sender.
+    :param receiver: The email address of the receiver.
+    :param password: The password of the sender.
+    :param cold_threshold: The cold threshold.
+    :param warm_threshold: The warm threshold.
+    :return: True if the email was successfully sent, otherwise False.
     """
-    if data:
-        region = data["name"]
-        description = data["weather"][0]["description"]
-        temp = round(data["main"]["temp"] - 273.15)
-        main = data["weather"][0]["main"]
-        today = datetime.now().strftime("%d.%m.%y")
 
-        conditions_txt = conditions(main)
-        clothing_txt = clothing(temp, cold_threshold, warm_threshold)
+    if not data:
+        return False
 
-        html_body = f"""
-        <html>
-            <head>
-                <style>
-                    body {{ font-family: Arial, sans-serif; }}
-                    table {{ width: 100%; border-collapse: collapse; }}
-                    th, td {{ border: 1px solid #ddd; padding: 8px; }}
-                    th {{ background-color: #f2f2f2; }}
-                </style>
-            </head>
-            <body>
-                <h2>Wetterbericht {region} für den {today}</h2>
-                <table>
-                    <tr>
-                        <th>Beschreibung</th>
-                        <td>{description}</td>
-                    </tr>
-                    <tr>
-                        <th>Aktuelle Temperatur</th>
-                        <td>{temp}°C</td>
-                    </tr>
-                    <tr>
-                        <th>Empfohlene Kleidung</th>
-                        <td>{conditions_txt + clothing_txt}</td>
-                    </tr>
-                </table>
-            </body>
-        </html>
+    region = data["name"]
+    description = data["weather"][0]["description"]
+    temp = round(data["main"]["temp"] - 273.15)
+    main = data["weather"][0]["main"]
+    today = datetime.now().strftime("%d.%m.%y")
+    conditions_txt = conditions(main)
+    clothing_txt = clothing(temp, cold_threshold, warm_threshold)
+
+    html_body = f"""
+    <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; }}
+                table {{ width: 100%; border-collapse: collapse; }}
+                th, td {{ border: 1px solid #ddd; padding: 8px; }}
+                th {{ background-color: #f2f2f2; }}
+            </style>
+        </head>
+        <body>
+            <h2>Wetterbericht {region} für den {today}</h2>
+            <table>
+                <tr>
+                    <th>Beschreibung</th>
+                    <td>{description}</td>
+                </tr>
+                <tr>
+                    <th>Aktuelle Temperatur</th>
+                    <td>{temp}°C</td>
+                </tr>
+                <tr>
+                    <th>Empfohlene Kleidung</th>
+                    <td>{conditions_txt + clothing_txt}</td>
+                </tr>
+            </table>
+        </body>
+    </html>
+    """
+
+    msg = MIMEMultipart("alternative")  # Both Text + HTML Content combined
+    msg["From"] = sender
+    msg["To"] = receiver
+    msg["Subject"] = f"Wetterbericht für {region} am {today}"
+    msg.attach(MIMEText(html_body, "html"))
+
+    try:  # Server connection test, prints clear description of errors
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(sender, password)
+            server.sendmail(sender, receiver, msg.as_string())
+        return True
+    except smtplib.SMTPException as e:
+        print(f"Fehler beim Senden der Mail: {e}")
+        return False
+
+
+class ConfigManager:
+    """
+    Manages reading and writing to the configuration file and handling encryption.
+    """
+
+    def __init__(self, config_path: str):
         """
+        Initializes the ConfigManager with the configuration file path.
 
-        msg = MIMEMultipart("alternative")  # Both Text + HTML Content combined
-        msg["From"] = sender
-        msg["To"] = receiver
-        msg["Subject"] = f"Wetterbericht für {region} am {today}"
-        msg.attach(MIMEText(html_body, "html"))
+        :param config_path: The path to the configuration file.
+        """
+        self.config_path = config_path
+        self.config = configparser.ConfigParser()
+        if not os.path.exists(self.config_path):
+            self.create_default_config()
+        self.key = self.generate_password_key()  # Load or generate the key at the start
 
-        try:  # Server connection test, prints clear description of errors
-            with smtplib.SMTP("smtp.gmail.com", 587) as server:
-                server.starttls()
-                server.login(sender, password)
-                server.sendmail(sender, receiver, msg.as_string())
-        except smtplib.SMTPException as e:
-            print(f"Fehler beim Senden der Mail: {e}")
+    def generate_password_key(self) -> bytes:
+        """
+        Generate or retrieve a valid Fernet key for encrypting email passwords.
+
+        :return: Returns bytes containing the Fernet key.
+        """
+        try:
+            with open(
+                "passwordKey.txt", "rb"
+            ) as file:  # Ensure this is 'rb' for binary read
+                key = file.read()
+                Fernet(key)  # Is the key valid?
+                return key  # Return Key as bytes
+        except (FileNotFoundError, ValueError):
+            # If the key file is missing or the key is invalid, generate new key
+            key = Fernet.generate_key()
+            with open("passwordKey.txt", "wb") as file:  # wb = write-binary
+                file.write(key)
+                self.create_default_config()
+                print("Invalid Password Key, creating default config")
+            return key
+
+    def create_default_config(self) -> None:
+        """
+        Creates a default configuration file if none is available.
+        """
+        self.config["WEATHER"] = {
+            "latitude": "51.4344",
+            "longitude": "6.7623",
+            "language": "de",
+            "cold_threshold": "5",
+            "warm_threshold": "20",
+        }
+        self.config["EMAIL"] = {
+            "sender_email": "sender@gmail.com",
+            "encrypted_password": "",
+            "receiver_email": "receiver@gmail.com",
+        }
+        with open(self.config_path, "w", encoding="utf-8") as configfile:
+            self.config.write(configfile)
+
+    def load_config(self) -> Dict[str, Any]:
+        """
+        Load configuration from the config.ini file.
+
+        :return: Returns a dictionary containing the loaded configuration values.
+        """
+        self.config.read(self.config_path)
+        cipher = Fernet(self.key)
+        encrypted_password = self.config.get("EMAIL", "encrypted_password")
+        try:
+            decrypted_password = (  # string into bytes, decrypt bytes back into string
+                cipher.decrypt(encrypted_password.encode()).decode()
+                if encrypted_password
+                else ""
+            )
+        except Exception as e:
+            print(f"Error decrypting password: {e}")
+            decrypted_password = ""
+        return {
+            "latitude": self.config.get("WEATHER", "latitude"),
+            "longitude": self.config.get("WEATHER", "longitude"),
+            "language": self.config.get("WEATHER", "language"),
+            "cold_threshold": int(self.config.get("WEATHER", "cold_threshold")),
+            "warm_threshold": int(self.config.get("WEATHER", "warm_threshold")),
+            "sender_email": self.config.get("EMAIL", "sender_email"),
+            "receiver_email": self.config.get("EMAIL", "receiver_email"),
+            "decrypted_password": decrypted_password,
+        }
+
+    def save_config(
+        self,
+        latitude,
+        longitude,
+        language,
+        cold_threshold,
+        warm_threshold,
+        sender_email,
+        receiver_email,
+        password,
+    ) -> None:
+        """
+        Save the current configuration to the config.ini file.
+
+        :param latitude: Latitude for weather data.
+        :param longitude: Longitude for weather data.
+        :param language: Language for weather data.
+        :param cold_threshold: Cold temperature threshold.
+        :param warm_threshold: Warm temperature threshold.
+        :param sender_email: Sender's email address.
+        :param receiver_email: Receiver's email address.
+        :param password: Sender's email password to be encrypted.
+        :return: None
+
+        """
+        self.config.read(self.config_path)
+
+        # Set new values in the config
+        self.config.set("WEATHER", "latitude", latitude)
+        self.config.set("WEATHER", "longitude", longitude)
+        self.config.set("WEATHER", "language", language)
+        self.config.set("WEATHER", "cold_threshold", cold_threshold)
+        self.config.set("WEATHER", "warm_threshold", warm_threshold)
+        self.config.set("EMAIL", "sender_email", sender_email)
+        self.config.set("EMAIL", "receiver_email", receiver_email)
+
+        # Encrypt and set the password
+        cipher = Fernet(self.key)
+        encrypted_password = cipher.encrypt(password.encode()).decode()
+        self.config.set("EMAIL", "encrypted_password", encrypted_password)
+
+        # Write the updated configuration back to file
+        with open(self.config_path, "w", encoding="utf-8") as configfile:
+            self.config.write(configfile)
 
 
-def password_key() -> bytes:
+class UserGUI(QMainWindow):
     """
-    Generate or retrieve a valid Fernet key for encrypting email password.
-
-    :return: Returns bytes containing the Fernet key.
-    """
-    try:
-        with open("passwordKey.txt", "r", encoding="utf-8") as file:
-            password_key = file.read()
-            Fernet(password_key)  # This just checks if the key is valid
-            return password_key.encode()  # Return the key as bytes
-    except (FileNotFoundError, ValueError):
-        password_key = Fernet.generate_key().decode()
-        create_default_config()
-        print("Ungültiger Fernet Key, alle Konfigurationsdaten wurden zurückgesetzt!")
-        with open("passwordKey.txt", "w", encoding="utf-8") as file:
-            file.write(password_key)
-        return password_key.encode()  # Return the new key as bytes
-
-
-def create_default_config() -> None:
-    """
-    Creates a default configuration file if none is available.
-    """
-    config = configparser.ConfigParser()
-
-    config["WEATHER"] = {
-        "latitude": "51.4344",
-        "longitude": "6.7623",
-        "language": "de",
-        "cold_threshold": "5",
-        "warm_threshold": "20",
-    }
-
-    config["EMAIL"] = {
-        "sender_email": "sender@gmail.com",
-        "encrypted_password": "",
-        "receiver_email": "receiver@gmail.com",
-    }
-
-    with open("config.ini", "w", encoding="utf-8") as configfile:
-        config.write(configfile)
-
-
-def save_config(
-    lat: str,
-    lon: str,
-    lang: str,
-    cold_threshold: str,
-    warm_threshold: str,
-    sender: str,
-    receiver: str,
-    password: str,
-    key: bytes,
-) -> None:
-    """
-    Save the current configuration to the config.ini file.
-
-    :param lat: Latitude for weather data.
-    :param lon: Longitude for weather data.
-    :param lang: Language for weather data.
-    :param cold_threshold: Cold temperature for clothing.
-    :param warm_threshold: Warm temperature for clothing.
-    :param sender: Senders email address.
-    :param receiver: Receivers email address.
-    :param password: Senders email password.
-    :param key: Encryption key for securing senders email passwort.
-    """
-    config = configparser.ConfigParser()
-    config.read("config.ini")
-
-    config.set("WEATHER", "latitude", lat)
-    config.set("WEATHER", "longitude", lon)
-    config.set("WEATHER", "language", lang)
-    config.set("WEATHER", "cold_threshold", str(cold_threshold))
-    config.set("WEATHER", "warm_threshold", str(warm_threshold))
-    config.set("EMAIL", "sender_email", sender)
-    config.set("EMAIL", "receiver_email", receiver)
-
-    # Encrypted Binary Key from passwordKey.txt saved in "cipher"
-    # Password-String into Bytes, encrypts them and decodes back into string
-    cipher = Fernet(key)
-    encrypted_password = cipher.encrypt(password.encode()).decode()
-    config.set("EMAIL", "encrypted_password", encrypted_password)
-
-    with open("config.ini", "w", encoding="utf-8") as config_data:
-        config.write(config_data)
-
-
-def load_config() -> Dict[str, Any]:
-    """
-    Load GUI configuration from the config.ini file.
-
-    :return: A dictionary containing all configuration values, including decrypted passwords.
-    """
-    config = configparser.ConfigParser()  # used to write/read config.ini
-    if not os.path.exists("config.ini"):
-        create_default_config()
-    config.read("config.ini")
-
-    with open("passwordKey.txt", "rb") as password_key:  # rb = read-binary
-        key = password_key.read()
-
-    cipher = Fernet(key)
-    encrypted_password = config.get("EMAIL", "encrypted_password")
-    decrypted_password = (  # string into bytes, decrypt bytes and back into string
-        cipher.decrypt(encrypted_password.encode()).decode()
-        if encrypted_password
-        else ""
-    )
-
-    return {
-        "latitude": config.get("WEATHER", "latitude"),
-        "longitude": config.get("WEATHER", "longitude"),
-        "language": config.get("WEATHER", "language"),
-        "cold_threshold": int(config.get("WEATHER", "cold_threshold")),
-        "warm_threshold": int(config.get("WEATHER", "warm_threshold")),
-        "sender_email": config.get("EMAIL", "sender_email"),
-        "receiver_email": config.get("EMAIL", "receiver_email"),
-        "decrypted_password": decrypted_password,
-    }
-
-
-def user_input() -> None:
-    """
-    Capture user input and send the email based on the input and current weather data.
-
-    This function initializes a Tkinter GUI for user inputs and parameters
-    and uses these inputs to collect weather data and send an email report.
+    Main class for the weather GUI.
     """
 
-    def on_submit():
-        lat = lat_input.get()
-        lon = lon_input.get()
-        lang = lang_input.get()
-        cold_threshold = cold_threshold_input.get()
-        warm_threshold = warm_threshold_input.get()
-        sender = sender_input.get()
-        receiver = receiver_input.get()
-        password = password_input.get()
+    def __init__(self, ConfigManager):
+        super().__init__()  # Creates object for the UI configuration
+        self.config_manager = ConfigManager
+        self.initUI()
 
-        key = password_key()
-        save_config(
-            lat,
-            lon,
-            lang,
-            cold_threshold,
-            warm_threshold,
-            sender,
-            receiver,
-            password,
-            key,
+    def initUI(self):
+        """
+        Initializes the GUI window design and appearance.
+
+        :return: None
+        """
+        self.setWindowTitle("WetterMail GUI")
+        self.setGeometry(100, 100, 500, 500)
+        self.central_widget = QWidget(self)
+        self.setCentralWidget(self.central_widget)
+        layout = QVBoxLayout(self.central_widget)
+
+        self.setupControls(layout)
+        self.save_input_checkbox = QCheckBox("Eingaben Speichern", self)
+        layout.addWidget(self.save_input_checkbox)
+
+        send_btn = QPushButton("Senden", self)
+        send_btn.clicked.connect(self.on_submit)
+        layout.addWidget(send_btn)
+
+        self.setStyleSheet(
+            """
+            QWidget {
+                font-family: 'Arial';
+                font-size: 14px;
+                background-color: #f0f4f8;
+            }
+            QLabel {
+                color: #2e3440;
+                padding: 8px;
+                font-weight: bold;
+            }
+            QLineEdit, QSlider {
+                border: 2px solid #88c0d0;
+                border-radius: 10px;
+                padding: 8px;
+                background-color: #eceff4;
+            }
+            QPushButton {
+                background-color: #5e81ac;
+                color: white;
+                border-radius: 10px;
+                padding: 10px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #81a1c1;
+            }
+            QSlider::groove:horizontal {
+                height: 10px;
+                background: transparent;
+            }
+            QSlider::handle:horizontal {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #eee, stop:1 #ccc);
+                border: 1px solid #777;
+                width: 18px;
+                margin-top: -2px;
+                margin-bottom: -2px;
+                border-radius: 8px;
+            }
+            QSlider#coldSlider::sub-page:horizontal {
+                background: #256fff;
+            }
+            QSlider#coldSlider::add-page:horizontal {
+                background: #a3be8c;
+            }
+            QSlider#warmSlider::sub-page:horizontal {
+                background: #a3be8c; 
+            }
+            QSlider#warmSlider::add-page:horizontal {
+                background: #f54029;
+            }
+            """
         )
 
-        data = get_data(API_KEY, lat, lon, lang)
-        send_email(data, sender, receiver, password, cold_threshold, warm_threshold)
-        window.destroy()
+    def setupControls(self, layout):
+        """
+        Sets up the controls for the GUI.
 
-    config_values = load_config()
+        :param layout: The layout to which the controls will be added.
+        :return: None
+        """
 
-    window = tk.Tk()
-    window.title("WetterMail")
-    window.geometry("360x230")
-    input_width = 35
+        # Loads config and puts it into input fields
+        config_values = self.config_manager.load_config()
+        self.entries = {}
+        labels = [
+            ("Breitengrad:", "latitude", False),
+            ("Längengrad:", "longitude", False),
+            ("Sprache (de/en):", "language", False),
+            ("Absender E-Mail:", "sender_email", False),
+            ("Absender Passwort:", "decrypted_password", True),
+            ("Empfänger E-Mail:", "receiver_email", False),
+        ]
 
-    # GUI setup code for the user input
-    tk.Label(window, text="Breitengrad:").grid(row=1, column=0)
-    lat_input = tk.Entry(window, width=input_width)
-    lat_input.insert(0, config_values["latitude"])
-    lat_input.grid(row=1, column=1)
+        # creates input fields dynamicaly for each config.ini entry
+        for label_text, key, hide_text in labels:
+            label = QLabel(label_text, self)
+            layout.addWidget(label)
+            entry = QLineEdit(self)
+            entry.setText(str(config_values[key]))
+            if hide_text:
+                entry.setEchoMode(QLineEdit.Password)
+            layout.addWidget(entry)
+            self.entries[key] = entry
 
-    tk.Label(window, text="Längengrad:").grid(row=2, column=0)
-    lon_input = tk.Entry(window, width=input_width)
-    lon_input.insert(0, config_values["longitude"])
-    lon_input.grid(row=2, column=1)
+        self.addTemperatureSliders(layout, config_values)
 
-    tk.Label(window, text="Sprache (de/en):").grid(row=3, column=0)
-    lang_input = tk.Entry(window, width=input_width)
-    lang_input.insert(0, config_values["language"])
-    lang_input.grid(row=3, column=1)
+    def addTemperatureSliders(self, layout, config_values):
+        """
+        Adds two temperature sliders to the GUI.
 
-    tk.Label(window, text="Kälteschwelle:").grid(row=4, column=0)
-    cold_threshold_input = tk.Entry(window, width=input_width)
-    cold_threshold_input.insert(0, config_values["cold_threshold"])
-    cold_threshold_input.grid(row=4, column=1)
+        :param layout: The layout to which the sliders will be added.
+        :param config_values: The configuration values for the sliders.
+        :return: None
+        """
 
-    tk.Label(window, text="Wärmeschwelle:").grid(row=5, column=0)
-    warm_threshold_input = tk.Entry(window, width=input_width)
-    warm_threshold_input.insert(0, config_values["warm_threshold"])
-    warm_threshold_input.grid(row=5, column=1)
+        self.slider_label = QLabel(
+            f"Temperatur Komfortzone: {config_values['cold_threshold']}°C - {config_values['warm_threshold']}°C",
+            self,
+        )
+        layout.addWidget(self.slider_label)
 
-    tk.Label(window, text="Absender E-Mail:").grid(row=6, column=0)
-    sender_input = tk.Entry(window, width=input_width)
-    sender_input.insert(0, config_values["sender_email"])
-    sender_input.grid(row=6, column=1)
+        slider_container = QWidget(self)
+        slider_layout = QHBoxLayout(slider_container)
+        self.cold_slider = QSlider(Qt.Horizontal, self)
+        self.cold_slider.setObjectName("coldSlider")
+        self.cold_slider.setMinimum(0)
+        self.cold_slider.setMaximum(15)
+        self.cold_slider.setValue(int(config_values["cold_threshold"]))
+        self.cold_slider.setTickPosition(QSlider.TicksBelow)
+        self.cold_slider.setTickInterval(1)
+        self.warm_slider = QSlider(Qt.Horizontal, self)
+        self.warm_slider.setObjectName("warmSlider")
+        self.warm_slider.setMinimum(15)
+        self.warm_slider.setMaximum(30)
+        self.warm_slider.setValue(int(config_values["warm_threshold"]))
+        self.warm_slider.setTickPosition(QSlider.TicksBelow)
+        self.warm_slider.setTickInterval(1)
 
-    tk.Label(window, text="Absender Passwort:").grid(row=7, column=0)
-    password_input = tk.Entry(window, show="*", width=input_width)
-    password_input.insert(0, config_values["decrypted_password"])
-    password_input.grid(row=7, column=1)
+        slider_layout.addWidget(self.cold_slider)
+        slider_layout.addWidget(self.warm_slider)
+        layout.addWidget(slider_container)
 
-    tk.Label(window, text="Empfänger E-Mail:").grid(row=8, column=0)
-    receiver_input = tk.Entry(window, width=input_width)
-    receiver_input.insert(0, config_values["receiver_email"])
-    receiver_input.grid(row=8, column=1)
+        self.cold_slider.valueChanged.connect(self.updateTemperatureLabels)
+        self.warm_slider.valueChanged.connect(self.updateTemperatureLabels)
 
-    submit_button = tk.Button(window, text="Senden", command=on_submit)
-    submit_button.grid(row=10, column=0, columnspan=2)
+    def updateTemperatureLabels(self):
+        self.slider_label.setText(
+            f"Temperatur Komfortzone {self.cold_slider.value()}°C - {self.warm_slider.value()}°C"
+        )
 
-    window.mainloop()  # GUI Reacts to user interaction like mouse clicks
+    def on_submit(self):
+        settings = {
+            "latitude": self.entries["latitude"].text(),
+            "longitude": self.entries["longitude"].text(),
+            "language": self.entries["language"].text(),
+            "cold_threshold": str(self.cold_slider.value()),
+            "warm_threshold": str(self.warm_slider.value()),
+        }
+
+        data = get_data(
+            API_KEY, settings["latitude"], settings["longitude"], settings["language"]
+        )
+
+        if data:
+            email_sent = send_email(
+                data,
+                self.entries["sender_email"].text(),
+                self.entries["receiver_email"].text(),
+                self.entries["decrypted_password"].text(),
+                settings["cold_threshold"],
+                settings["warm_threshold"],
+            )
+            if email_sent:
+                QMessageBox.information(self, "Erfolg", "E-Mail erfolgreich gesendet!")
+                self.close()
+            else:  # If email was not sent
+                QMessageBox.warning(self, "Fehler", "Fehler beim Senden der E-Mail.")
+
+        else:  # If data is None
+            QMessageBox.warning(self, "Fehler", "Fehler beim Abrufen der Wetterdaten.")
+
+        # Check the checkbox before saving the configuration
+        if self.save_input_checkbox.isChecked():
+            self.config_manager.save_config(
+                settings["latitude"],
+                settings["longitude"],
+                settings["language"],
+                settings["cold_threshold"],
+                settings["warm_threshold"],
+                self.entries["sender_email"].text(),
+                self.entries["receiver_email"].text(),
+                self.entries["decrypted_password"].text(),
+            )
 
 
 if __name__ == "__main__":
+    import sys
+
+    app = QApplication(sys.argv)
     API_KEY = "e055a71967956ab0d652f985f92e79a4"
-    password_key()
-    user_input()
+    config_manager = ConfigManager("config.ini")
+    email_settings = config_manager.load_config()
+
+    # Initialize GUI with the configuration manager and the API key
+    gui = UserGUI(config_manager)
+    gui.show()
+    sys.exit(app.exec_())
