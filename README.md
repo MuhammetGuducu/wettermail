@@ -7,7 +7,7 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 ## Verwendete Sprachen und Bibliotheken
 
 - **Python**: Einzige Programmiersprache, die verwendet wurde.
-- **Tkinter**: Eine Python-Bibliothek für die Erstellung des GUI.
+- **PyQt5**: Eine Python-Bibliothek für die Erstellung des GUI.
 - **Requests**: Für HTTP-Anfragen zur Abfrage der Wetterdaten.
 - **smtplib**: Zum Versenden von E-Mails.
 - **configparser**: Für das Lesen/Schreiben von Konfigurationsdateien.
@@ -29,7 +29,6 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 
 - Integration zusätzlicher Wetterdatenquellen für genauere Vorhersagen und Empfehlungen.
 - Implementierung von Benutzerprofilen für personalisierte Einstellungen wie zb. Outfit-Bezeichnungen.
-- Verbesserung der Sicherheit, siehe "Aktuelle Probleme".
 - Pylint, Unittest, Type Hinting und Sphinx verwenden. ✅
 - Entwicklung einer Website mit dem Django Framework.
 
@@ -37,7 +36,6 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 
 ## Aktuelle Probleme
 
-- **Sicherheit**: Fernet zur Verschlüsselung ist nicht absolut sicher, da der `passwordKey` in falsche Hände geraten kann.
 - **Mehr Mail-Provider**: Aktuell ist das Programm nur auf G-Mail ausgerichtet durch die smtplib Library.
 
 
@@ -52,7 +50,6 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 ## Screenshots 
 ![EMAIL](https://github.com/MuhammetGuducu/wettermail/assets/84397069/a2f6554f-f4d9-43ae-ac6f-da113c3b6460)
 ![CONFIG](https://github.com/MuhammetGuducu/wettermail/assets/84397069/2eb53a12-1594-4a54-8319-30cfe8a18c46)
-![GUI](https://github.com/MuhammetGuducu/wettermail/assets/84397069/cb412b6b-c60b-436c-be86-5dcb06cb0adf)
+![gui](https://github.com/MuhammetGuducu/wettermail/assets/84397069/7b42e256-272c-40f5-bc46-280518a78dfb)
 ![TEST](https://github.com/MuhammetGuducu/wettermail/assets/84397069/2e13568e-1aa1-4ab1-930b-fccd4fd37747)
-![SPHINX](https://github.com/MuhammetGuducu/wettermail/assets/84397069/91c1b4b8-d725-4164-8f8b-76dc4d26e8ea)
-![SPHINX2](https://github.com/MuhammetGuducu/wettermail/assets/84397069/a0a44afe-e05c-4ed5-8727-ef1b9403beb4)
+![sphinx](https://github.com/MuhammetGuducu/wettermail/assets/84397069/aef3a322-a588-4a18-8e6e-c4bb142a1c66)
