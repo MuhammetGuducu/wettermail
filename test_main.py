@@ -1,5 +1,5 @@
 """
-This module tests each function from main.py by using unittest
+This module tests the functionality of each main.py component by using unittest
 """
 
 import main
@@ -8,11 +8,10 @@ from unittest.mock import patch, mock_open
 from cryptography.fernet import Fernet
 
 
-
 class test_functionality(unittest.TestCase):
     def test_conditions_rain(self):
         """Test conditions function for rainy weather."""
-        self.assertEqual(main.conditions("Rain"), "Kopfbedeckung und ")
+        self.assertEqual(main.conditions("Rain"), "Kopfbedeckung und ") # Does it return "Kopfbedeckung und" when it rains?
 
     def test_conditions_snow(self):
         """Test conditions function for snowy weather."""
@@ -46,30 +45,25 @@ class test_functionality(unittest.TestCase):
 
     def test_create_default_config(self):
         """Test create_default_config function for creating default config."""
-        main.create_default_config()
+        config_manager = main.ConfigManager("config.ini")
+        config_manager.create_default_config()
 
     @patch("builtins.open", new_callable=unittest.mock.mock_open)
     def test_create_default_config_file_creation(self, mock_open):
         """Test whether create_default_config creates a config file."""
-        main.create_default_config()
+        config_manager = main.ConfigManager("config.ini")
+        config_manager.create_default_config()
         mock_open.assert_called_with("config.ini", "w", encoding="utf-8")
-
 
 
 class test_read(unittest.TestCase):
 
     @patch("main.open", new_callable=mock_open, read_data="[DEFAULT]\n")
     def test_save_config(self, mock_file):
-        main.save_config(
-            "1",
-            "1",
-            "de",
-            "1",
-            "1",
-            "test@gmail.com",
-            "test@gmail.com",
-            "1",
-            "GJwdfls_ApgtFJnKmMV9dmzrMt_10Y4_Qe2HiBEyI6c=",
+        """Test whether save_config saves a config file."""
+        config_manager = main.ConfigManager("config.ini")
+        config_manager.save_config(
+            "1", "1", "de", "1", "1", "test@gmail.com", "test@gmail.com", "1"
         )
         mock_file.assert_called_with("config.ini", "w", encoding="utf-8")
 
@@ -91,18 +85,24 @@ class test_read(unittest.TestCase):
         mock_config = mock_config_parser.return_value
         mock_config.get.side_effect = lambda section, option: preset_config.get(option)
 
-        config = main.load_config()
+        config_manager = main.ConfigManager("config.ini")
+        config = config_manager.load_config()
 
-        # Check if loaded config matches the preset config
+        # check if loaded config match the preset config
         for key, value in preset_config.items():
             self.assertEqual(config.get(key, ""), value)
 
-    @patch("main.open",new_callable=mock_open, read_data="GJwdfls_ApgtFJnKmMV9dmzrMt_10Y4_Qe2HiBEyI6c=")
+    @patch(
+        "main.open",
+        new_callable=mock_open,
+        read_data="GJwdfls_ApgtFJnKmMV9dmzrMt_10Y4_Qe2HiBEyI6c=",
+    )
     def test_password_key(self, mock_file):
-        key = main.password_key()
-        self.assertIsInstance(key, bytes)  # Ensure it returns bytes
+        config_manager = main.ConfigManager("config.ini")
+        key = config_manager.generate_password_key()
+        self.assertIsInstance(key, str)  # Does it return string as key
         try:
-            Fernet(key)
+            Fernet(key.encode())
         except ValueError:
             self.fail("function password_key() returns an invalid FernetKey")
 
