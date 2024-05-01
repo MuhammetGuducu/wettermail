@@ -29,14 +29,8 @@ WetterMail ist ein Python-Skript, das Nutzern basierend auf wählbaren Parameter
 
 - Integration zusätzlicher Wetterdatenquellen für genauere Vorhersagen und Empfehlungen.
 - Implementierung von Benutzerprofilen für personalisierte Einstellungen wie zb. Outfit-Bezeichnungen.
-- Pylint, Unittest, Type Hinting und Sphinx verwenden. ✅
 - Entwicklung einer Website mit dem Django Framework.
-
-
-
-## Aktuelle Probleme
-
-- **Mehr Mail-Provider**: Aktuell ist das Programm nur auf G-Mail ausgerichtet durch die smtplib Library.
+- Weitere E-Mail Provider, da aktuell nur G-Mail unterstützt wird. 
 
 
 
