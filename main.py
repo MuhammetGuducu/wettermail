@@ -552,7 +552,7 @@ if __name__ == "__main__":
     import sys
 
     app = QApplication(sys.argv)
-    API_KEY = "e055a71967956ab0d652f985f92e79a4"
+    API_KEY = "xxxx"
     config_manager = ConfigManager("config.ini")
     email_settings = config_manager.load_config()
 
